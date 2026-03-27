@@ -1,0 +1,34 @@
+# SSH Tunnel TUI Manager Configuration
+# Path: ~/.config/ssh-tun-tui/config.toml
+
+[settings]
+ssh_bin = "ssh"                        # Path to SSH binary
+control_dir = "/tmp/ssh-tun-tui"       # Control socket directory
+kill_on_exit = false                    # Kill tunnels on exit
+
+# Local port forwarding: local_port:remote_host:remote_port
+[[tunnels]]
+name = "dev-db"
+type = "local"
+local_port = 3307
+remote_host = "localhost"
+remote_port = 3306
+login = "deploy@db-server"
+group = "dev"
+
+# Remote port forwarding: remote_port:remote_host:local_port
+[[tunnels]]
+name = "remote-api"
+type = "remote"
+local_port = 8080
+remote_host = "localhost"
+remote_port = 80
+login = "deploy@api-server"
+group = "staging"
+
+# Dynamic (SOCKS) proxy
+[[tunnels]]
+name = "socks-proxy"
+type = "dynamic"
+local_port = 1080
+login = "user@jump-host"
