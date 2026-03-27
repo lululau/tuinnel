@@ -207,12 +207,14 @@ func (m Model) View() tea.View {
 		content += ui.StyleError.Render(confirm)
 	}
 
-	return tea.NewView(fmt.Sprintf("%s\n%s\n%s\n%s",
+	v := tea.NewView(fmt.Sprintf("%s\n%s\n%s\n%s",
 		ui.StyleTitle.Render(" ssh-tun-tui"),
 		m.tabBar.View(),
 		content,
 		statusBar,
 	))
+	v.AltScreen = true
+	return v
 }
 
 func (m *Model) switchTab(id tabs.TabID) {
