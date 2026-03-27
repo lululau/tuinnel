@@ -80,12 +80,17 @@ func (tb *TabBar) View() string {
 	tabs := strings.Join(parts, " ")
 	help := ui.StyleHelp.Render("?=Help")
 
-	right := tb.width - lipgloss.Width(tabs) - 2
+	right := tb.width - lipgloss.Width(tabs) - lipgloss.Width(help) - 2
 	if right < 0 {
 		right = 0
 	}
 
+	row := fmt.Sprintf("%s%s%s", tabs, strings.Repeat(" ", right), help)
+
+	// Full-width separator line below the tab bar
+	sep := ui.StyleTabSep.Render(strings.Repeat("─", tb.width))
+
 	return lipgloss.NewStyle().Width(tb.width).Render(
-		fmt.Sprintf("%s%s%s", tabs, strings.Repeat(" ", right), help),
+		fmt.Sprintf("%s\n%s", row, sep),
 	)
 }

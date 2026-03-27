@@ -53,6 +53,7 @@ func NewTunnelListModel() TunnelListModel {
 func (m *TunnelListModel) SetSize(w, h int) {
 	m.width = w
 	m.height = h
+	m.table.SetWidth(w)
 	m.table.SetHeight(h - 4)
 }
 

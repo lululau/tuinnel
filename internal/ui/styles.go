@@ -35,9 +35,10 @@ var (
 			Bold(true).
 			Foreground(ColorCyan).
 			Padding(0, 1).
-			BorderStyle(lipgloss.NormalBorder()).
-			BorderBottom(true).
-			BorderForeground(ColorCyan)
+			Background(ColorSurface)
+
+	StyleTabSep = lipgloss.NewStyle().
+			Foreground(ColorDim)
 
 	StyleTabInactive = lipgloss.NewStyle().
 				Foreground(ColorSubtext).
@@ -56,6 +57,34 @@ var (
 	StyleInput = lipgloss.NewStyle().
 			Foreground(ColorText).
 			Background(ColorSurface)
+
+	StyleHelpOverlay = lipgloss.NewStyle().
+				BorderStyle(lipgloss.RoundedBorder()).
+				BorderForeground(ColorCyan).
+				Padding(1, 3)
+
+	StyleHelpTitle = lipgloss.NewStyle().
+			Bold(true).
+			Foreground(ColorCyan).
+			MarginBottom(1)
+
+	StyleHelpKey = lipgloss.NewStyle().
+			Foreground(ColorYellow).
+			Bold(true).
+			Width(14)
+
+	StyleHelpDesc = lipgloss.NewStyle().
+			Foreground(ColorText)
+
+	StyleHelpSection = lipgloss.NewStyle().
+			Bold(true).
+			Foreground(ColorSubtext).
+			MarginTop(1).
+			MarginBottom(0)
+
+	StyleHelpClose = lipgloss.NewStyle().
+			Foreground(ColorGray).
+			MarginTop(1)
 )
 
 // Ensure color.Color is used to prevent import being removed.

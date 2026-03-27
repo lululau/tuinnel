@@ -2,9 +2,11 @@ package app
 
 import (
 	"fmt"
+	"strings"
 
 	tea "charm.land/bubbletea/v2"
 	"charm.land/bubbles/v2/key"
+	"charm.land/lipgloss/v2"
 
 	"github.com/ssh-tun-tui/internal/tunnel"
 	"github.com/ssh-tun-tui/internal/ui"
@@ -47,13 +49,13 @@ type Model struct {
 	width       int
 	height      int
 	confirm     confirmQuit
+	showHelp    bool
 	statusMsg   string
 	quitting    bool
 }
 
 func NewModel(cfg *tunnel.Config, configPath string) Model {
 	mgr := tunnel.NewManager(cfg)
-	mgr.Refresh()
 
 	m := Model{
 		mgr:         mgr,
@@ -87,13 +89,24 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	case tea.KeyPressMsg:
+		if m.showHelp {
+			switch msg.String() {
+			case "?", "esc", "q":
+				m.showHelp = false
+				return m, nil
+			}
+			return m, nil
+		}
+
 		if m.confirm.active {
 			switch msg.String() {
-			case "y":
+			case "k":
+				_ = m.mgr.StopAll()
+				m.syncTunnels()
 				m.quitting = true
-				if m.config.Settings.KillOnExit {
-					_ = m.mgr.StopAll()
-				}
+				return m, tea.Quit
+			case "l":
+				m.quitting = true
 				return m, tea.Quit
 			case "n", "esc":
 				m.confirm.active = false
@@ -138,6 +151,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, appKeys.TabPrev):
 			prev := tabs.TabID((int(m.tabBar.Active()) - 1 + int(tabs.TabCount)) % int(tabs.TabCount))
 			m.switchTab(prev)
+			return m, nil
+		case key.Matches(msg, appKeys.Help):
+			m.showHelp = !m.showHelp
 			return m, nil
 		}
 
@@ -200,9 +216,8 @@ func (m Model) View() tea.View {
 
 	if m.confirm.active {
 		confirm := fmt.Sprintf(
-			"\n  %d tunnels are running. Quit and %s them? [y/n]\n",
+			"\n  %d tunnels are running. (k)ill and quit / (l)eave running and quit / (n)cancel\n",
 			m.mgr.RunningCount(),
-			map[bool]string{true: "kill", false: "leave"}[m.config.Settings.KillOnExit],
 		)
 		content += ui.StyleError.Render(confirm)
 	}
@@ -214,6 +229,11 @@ func (m Model) View() tea.View {
 		statusBar,
 	))
 	v.AltScreen = true
+
+	if m.showHelp {
+		v.Content = m.helpOverlay()
+	}
+
 	return v
 }
 
@@ -350,4 +370,67 @@ func (m Model) handleEditorMsg(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	m.editorTab, cmd = m.editorTab.Update(msg)
 	return m, cmd
+}
+
+func (m Model) helpOverlay() string {
+	sections := []struct {
+		title string
+		binds [][2]string
+	}{
+		{
+			title: "Global",
+			binds: [][2]string{
+				{"1/2/3/4", "Switch tabs"},
+				{"tab/⇧+tab", "Next/prev tab"},
+				{"?", "Toggle this help"},
+				{"q/ctrl+c", "Quit"},
+			},
+		},
+		{
+			title: "Tunnel List",
+			binds: [][2]string{
+				{"enter/r", "Start tunnel"},
+				{"s", "Stop tunnel"},
+				{"R", "Restart tunnel"},
+				{"g", "Refresh status"},
+				{"e", "Edit tunnel"},
+				{"↑/↓", "Move selection"},
+			},
+		},
+		{
+			title: "Logs",
+			binds: [][2]string{
+				{"↑/↓/j/k", "Select tunnel / scroll"},
+			},
+		},
+		{
+			title: "Editor",
+			binds: [][2]string{
+				{"tab", "Next field"},
+				{"enter", "Save"},
+				{"esc", "Cancel"},
+			},
+		},
+	}
+
+	var body strings.Builder
+	for _, s := range sections {
+		body.WriteString(ui.StyleHelpSection.Render(s.title))
+		body.WriteString("\n")
+		for _, b := range s.binds {
+			body.WriteString(ui.StyleHelpKey.Render(b[0]))
+			body.WriteString(ui.StyleHelpDesc.Render(b[1]))
+			body.WriteString("\n")
+		}
+	}
+	body.WriteString(ui.StyleHelpClose.Render("Press ? or esc to close"))
+
+	panel := ui.StyleHelpOverlay.Render(
+		ui.StyleHelpTitle.Render("Keyboard Shortcuts") + "\n" + body.String(),
+	)
+
+	return lipgloss.Place(m.width, m.height,
+		lipgloss.Center, lipgloss.Center,
+		panel,
+	)
 }
