@@ -1,0 +1,19 @@
+[settings]
+ssh_bin = "ssh"
+control_dir = "/tmp/ssh-tun-tui"
+kill_on_exit = false
+
+[[tunnels]]
+name = "dev-db"
+type = "local"
+local_port = 3307
+remote_host = "localhost"
+remote_port = 3306
+login = "deploy@db-server"
+group = "dev"
+
+[[tunnels]]
+name = "socks-proxy"
+type = "dynamic"
+local_port = 1080
+login = "user@jump-host"
