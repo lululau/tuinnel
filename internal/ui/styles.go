@@ -48,6 +48,13 @@ var (
 			Foreground(ColorSubtext).
 			Padding(0, 1)
 
+	StyleWarning = lipgloss.NewStyle().
+			Foreground(ColorYellow)
+
+	StyleWarningPadded = lipgloss.NewStyle().
+				Foreground(ColorYellow).
+				Padding(0, 1)
+
 	StyleHelp = lipgloss.NewStyle().
 			Foreground(ColorGray)
 
@@ -85,6 +92,12 @@ var (
 	StyleHelpClose = lipgloss.NewStyle().
 			Foreground(ColorGray).
 			MarginTop(1)
+
+	StyleModal = lipgloss.NewStyle().
+			BorderStyle(lipgloss.RoundedBorder()).
+			BorderForeground(ColorCyan).
+			Padding(1, 3).
+			MaxWidth(60)
 )
 
 // Ensure color.Color is used to prevent import being removed.

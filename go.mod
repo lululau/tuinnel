@@ -1,4 +1,4 @@
-module github.com/ssh-tun-tui
+module github.com/lululau/tuinnel
 
 go 1.26.1
 

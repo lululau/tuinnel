@@ -1,9 +1,9 @@
 # SSH Tunnel TUI Manager Configuration
-# Path: ~/.config/ssh-tun-tui/config.toml
+# Path: ~/.config/tuinnel/config.toml
 
 [settings]
 ssh_bin = "ssh"                        # Path to SSH binary
-control_dir = "/tmp/ssh-tun-tui"       # Control socket directory
+control_dir = "/tmp/tuinnel"       # Control socket directory
 kill_on_exit = false                    # Kill tunnels on exit
 
 # Local port forwarding: local_port:remote_host:remote_port

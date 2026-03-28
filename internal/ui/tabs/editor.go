@@ -9,8 +9,8 @@ import (
 	"charm.land/bubbles/v2/key"
 	"charm.land/bubbles/v2/textinput"
 
-	"github.com/ssh-tun-tui/internal/tunnel"
-	"github.com/ssh-tun-tui/internal/ui"
+	"github.com/lululau/tuinnel/internal/tunnel"
+	"github.com/lululau/tuinnel/internal/ui"
 )
 
 type editorMode int
@@ -66,8 +66,12 @@ var editorKeys = struct {
 func (m *EditorModel) SetSize(w, h int) {
 	m.width = w
 	m.height = h
+	inputWidth := w - 25
+	if inputWidth > 28 {
+		inputWidth = 28
+	}
 	for i := range m.inputs {
-		m.inputs[i].SetWidth(w - 25)
+		m.inputs[i].SetWidth(inputWidth)
 	}
 }
 
@@ -156,6 +160,20 @@ func (m *EditorModel) Update(msg tea.Msg) (EditorModel, tea.Cmd) {
 			return *m, nil
 		case key.Matches(msg, editorKeys.Save):
 			return *m, func() tea.Msg { return EditorSaveMsg{} }
+		case msg.String() == "tab":
+			if m.focus >= 0 && m.focus < len(m.inputs)-1 {
+				m.inputs[m.focus].Blur()
+				m.focus++
+				cmd = m.inputs[m.focus].Focus()
+				return *m, cmd
+			}
+		case msg.String() == "shift+tab":
+			if m.focus > 0 {
+				m.inputs[m.focus].Blur()
+				m.focus--
+				cmd = m.inputs[m.focus].Focus()
+				return *m, cmd
+			}
 		case msg.String() == "enter":
 			if m.focus >= 0 && m.focus < len(m.inputs)-1 {
 				m.inputs[m.focus].Blur()
@@ -183,12 +201,14 @@ func (m *EditorModel) Update(msg tea.Msg) (EditorModel, tea.Cmd) {
 }
 
 func (m EditorModel) View() string {
+	if m.mode == editorIdle {
+		return ""
+	}
+
 	labels := []string{"Name", "Type", "Local Port", "Remote Host", "Remote Port", "Login", "Group"}
 
 	var title string
 	switch m.mode {
-	case editorIdle:
-		title = ui.StyleTitle.Render("Tunnel Editor")
 	case editorAdd:
 		title = ui.StyleTitle.Render("Add New Tunnel")
 	case editorEdit:
@@ -214,7 +234,7 @@ func (m EditorModel) View() string {
 		s.WriteString("\n" + ui.StyleError.Render(m.Message))
 	}
 
-	s.WriteString("\n" + ui.StyleHelp.Render("a: add new • ctrl+s: save • ctrl+d: delete • esc: cancel"))
+	s.WriteString("\n" + ui.StyleHelp.Render("ctrl+s: save • esc: cancel"))
 
 	return s.String()
 }

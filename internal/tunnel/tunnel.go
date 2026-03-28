@@ -46,6 +46,7 @@ type Tunnel struct {
 
 	Running bool `toml:"-"`
 	Error   bool `toml:"-"`
+	Stale   bool `toml:"-"` // socket or process exists without the other
 }
 
 func (t Tunnel) ForwardSpec() string {

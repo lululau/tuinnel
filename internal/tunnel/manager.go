@@ -5,7 +5,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/ssh-tun-tui/internal/ssh"
+	"github.com/lululau/tuinnel/internal/ssh"
 )
 
 type RingBuffer struct {
@@ -122,7 +122,11 @@ func (m *Manager) Start(name string) error {
 	t := &m.tunnels[idx]
 
 	socket := m.client.SocketPath(t.Name)
-	if m.client.Check(socket, t.Login) {
+
+	// Check socket file exists first (avoids false positives from global
+	// ControlMaster=yes in ~/.ssh/config which can make ssh -O check
+	// succeed on the wrong socket path)
+	if _, err := os.Stat(socket); err == nil && m.client.Check(socket, t.Login) {
 		t.Running = true
 		t.Error = false
 		return nil
@@ -136,6 +140,22 @@ func (m *Manager) Start(name string) error {
 	if err := m.client.Start(socket, t.Type.SSHFlag(), forward, t.Login); err != nil {
 		t.Error = true
 		t.Running = false
+		m.Log(name).Add(fmt.Sprintf("[ERROR] %s", err))
+		return err
+	}
+
+	// Verify the tunnel actually started
+	if _, statErr := os.Stat(socket); statErr != nil {
+		t.Error = true
+		t.Running = false
+		err := fmt.Errorf("ssh start: socket not created at %s", socket)
+		m.Log(name).Add(fmt.Sprintf("[ERROR] %s", err))
+		return err
+	}
+	if !m.client.Check(socket, t.Login) {
+		t.Error = true
+		t.Running = false
+		err := fmt.Errorf("ssh start: socket exists but not responding")
 		m.Log(name).Add(fmt.Sprintf("[ERROR] %s", err))
 		return err
 	}
@@ -154,11 +174,14 @@ func (m *Manager) Stop(name string) error {
 	t := &m.tunnels[idx]
 
 	socket := m.client.SocketPath(t.Name)
-	if err := m.client.Stop(socket, t.Login); err != nil {
-		t.Error = true
-		m.Log(name).Add(fmt.Sprintf("[ERROR] stop: %s", err))
-		return err
-	}
+
+	// Try ssh -O exit first (clean shutdown)
+	_ = m.client.Stop(socket, t.Login)
+
+	// Always attempt to kill any remaining SSH process for this socket.
+	// ssh -O exit may remove the socket without killing the process due to
+	// global ControlMaster=yes in ~/.ssh/config.
+	m.client.KillBySocket(socket)
 
 	t.Running = false
 	t.Error = false
@@ -201,9 +224,35 @@ func (m *Manager) StopAll() error {
 func (m *Manager) Refresh() {
 	for i, t := range m.tunnels {
 		socket := m.client.SocketPath(t.Name)
-		m.tunnels[i].Running = m.client.Check(socket, t.Login)
+		_, statErr := os.Stat(socket)
+		socketExists := statErr == nil
+		processExists := m.client.HasProcess(socket)
+
+		m.tunnels[i].Running = socketExists && processExists
 		m.tunnels[i].Error = false
+		m.tunnels[i].Stale = socketExists && !processExists
 	}
+}
+
+// CleanupStale kills orphan processes and removes stale sockets for all
+// tunnels in stale state. Returns counts of cleaned and failed tunnels.
+func (m *Manager) CleanupStale() (cleaned, failed int) {
+	for i, t := range m.tunnels {
+		if !t.Stale {
+			continue
+		}
+		socket := m.client.SocketPath(t.Name)
+		if err := m.client.KillBySocket(socket); err != nil {
+			failed++
+			continue
+		}
+		m.tunnels[i].Running = false
+		m.tunnels[i].Error = false
+		m.tunnels[i].Stale = false
+		m.Log(t.Name).Add("[CLEANED UP stale state]")
+		cleaned++
+	}
+	return
 }
 
 func (m *Manager) AddTunnel(t Tunnel) {

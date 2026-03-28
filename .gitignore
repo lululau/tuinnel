@@ -13,7 +13,7 @@
 *.dylib
 
 # Project binary
-ssh-tun-tui
+tuinnel
 
 # Test binary, built with `go test -c`
 *.test

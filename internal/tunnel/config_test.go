@@ -35,7 +35,7 @@ func TestLoadConfigDefaults(t *testing.T) {
 	if cfg.Settings.SSHBin != "ssh" {
 		t.Errorf("SSHBin default = %q, want %q", cfg.Settings.SSHBin, "ssh")
 	}
-	if cfg.Settings.ControlDir != "/tmp/ssh-tun-tui" {
+	if cfg.Settings.ControlDir != "/tmp/tuinnel" {
 		t.Errorf("ControlDir default = %q", cfg.Settings.ControlDir)
 	}
 	if len(cfg.Tunnels) != 0 {
@@ -72,7 +72,7 @@ func TestSaveConfig(t *testing.T) {
 
 func TestConfigPath(t *testing.T) {
 	home, _ := os.UserHomeDir()
-	want := filepath.Join(home, ".config", "ssh-tun-tui", "config.toml")
+	want := filepath.Join(home, ".config", "tuinnel", "config.toml")
 	if got := DefaultConfigPath(); got != want {
 		t.Errorf("DefaultConfigPath() = %q, want %q", got, want)
 	}

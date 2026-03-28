@@ -1,6 +1,6 @@
 [settings]
 ssh_bin = "ssh"
-control_dir = "/tmp/ssh-tun-tui"
+control_dir = "/tmp/tuinnel"
 kill_on_exit = false
 
 [[tunnels]]

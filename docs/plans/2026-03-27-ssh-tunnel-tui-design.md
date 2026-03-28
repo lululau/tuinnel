@@ -15,7 +15,7 @@ main → App Model → Tab Models → SSH Manager
 ### Project Structure
 
 ```
-ssh-tun-tui/
+tuinnel/
 ├── main.go                    # Entry point, bubbletea init
 ├── go.mod / go.sum
 ├── internal/
@@ -74,12 +74,12 @@ type Tunnel struct {
 
 ### TOML Configuration
 
-Path: `~/.config/ssh-tun-tui/config.toml`
+Path: `~/.config/tuinnel/config.toml`
 
 ```toml
 [settings]
 ssh_bin = "ssh"
-control_dir = "/tmp/ssh-tun-tui"
+control_dir = "/tmp/tuinnel"
 kill_on_exit = false
 
 [[tunnels]]
@@ -112,7 +112,7 @@ login = "user@jump-host"
 ### Overall Structure
 
 ```
-┌─ ssh-tun-tui ────────────────────────────────────┐
+┌─ tuinnel ────────────────────────────────────┐
 │ [Tunnels] [Logs] [Settings] [Editor]    ?=Help   │
 ├──────────────────────────────────────────────────┤
 │                                                   │

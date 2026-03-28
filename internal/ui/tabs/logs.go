@@ -8,8 +8,8 @@ import (
 	"charm.land/bubbles/v2/viewport"
 	"charm.land/lipgloss/v2"
 
-	"github.com/ssh-tun-tui/internal/tunnel"
-	"github.com/ssh-tun-tui/internal/ui"
+	"github.com/lululau/tuinnel/internal/tunnel"
+	"github.com/lululau/tuinnel/internal/ui"
 )
 
 type LogModel struct {

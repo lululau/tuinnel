@@ -7,7 +7,7 @@ import (
 	tea "charm.land/bubbletea/v2"
 	"charm.land/lipgloss/v2"
 
-	"github.com/ssh-tun-tui/internal/ui"
+	"github.com/lululau/tuinnel/internal/ui"
 )
 
 type TabID int
@@ -16,7 +16,6 @@ const (
 	TabTunnels TabID = iota
 	TabLogs
 	TabSettings
-	TabEditor
 	TabCount
 )
 
@@ -28,15 +27,13 @@ func (id TabID) String() string {
 		return "Logs"
 	case TabSettings:
 		return "Settings"
-	case TabEditor:
-		return "Editor"
 	default:
 		return "Unknown"
 	}
 }
 
 func AllTabs() []TabID {
-	return []TabID{TabTunnels, TabLogs, TabSettings, TabEditor}
+	return []TabID{TabTunnels, TabLogs, TabSettings}
 }
 
 type TabBar struct {

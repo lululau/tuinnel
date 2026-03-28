@@ -8,8 +8,8 @@ import (
 	"charm.land/bubbles/v2/key"
 	"charm.land/bubbles/v2/textinput"
 
-	"github.com/ssh-tun-tui/internal/tunnel"
-	"github.com/ssh-tun-tui/internal/ui"
+	"github.com/lululau/tuinnel/internal/tunnel"
+	"github.com/lululau/tuinnel/internal/ui"
 )
 
 type SettingsModel struct {
@@ -30,7 +30,7 @@ func NewSettingsModel(settings tunnel.Settings) SettingsModel {
 	inputs[0].SetValue(settings.SSHBin)
 
 	inputs[1] = textinput.New()
-	inputs[1].Placeholder = "/tmp/ssh-tun-tui"
+	inputs[1].Placeholder = "/tmp/tuinnel"
 	inputs[1].CharLimit = 100
 	inputs[1].SetValue(settings.ControlDir)
 
@@ -143,8 +143,6 @@ func (m SettingsModel) View() string {
 		}
 		s.WriteString(fmt.Sprintf("%s %s: %s\n", cursor, label, style.Render(m.inputs[i].View())))
 	}
-
-	s.WriteString("\n" + ui.StyleHelp.Render("enter: edit • ctrl+s: save • esc: back"))
 
 	return s.String()
 }

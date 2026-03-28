@@ -21,13 +21,13 @@ type Config struct {
 
 func DefaultConfigPath() string {
 	home, _ := os.UserHomeDir()
-	return filepath.Join(home, ".config", "ssh-tun-tui", "config.toml")
+	return filepath.Join(home, ".config", "tuinnel", "config.toml")
 }
 
 func DefaultSettings() Settings {
 	return Settings{
 		SSHBin:     "ssh",
-		ControlDir: "/tmp/ssh-tun-tui",
+		ControlDir: "/tmp/tuinnel",
 	}
 }
 

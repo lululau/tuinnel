@@ -31,9 +31,9 @@
 
 Run:
 ```bash
-cd /Users/liuxiang/cascode/github.com/ssh-tun-tui
+cd /Users/liuxiang/cascode/github.com/lululau/tuinnel
 mkdir -p internal/tunnel internal/ssh internal/ui/tabs internal/app
-go mod init github.com/ssh-tun-tui
+go mod init github.com/lululau/tuinnel
 ```
 
 **Step 2: Install dependencies**
@@ -292,7 +292,7 @@ Create `testdata/config_valid.toml`:
 ```toml
 [settings]
 ssh_bin = "ssh"
-control_dir = "/tmp/ssh-tun-tui"
+control_dir = "/tmp/tuinnel"
 kill_on_exit = false
 
 [[tunnels]]
@@ -357,7 +357,7 @@ func TestLoadConfigDefaults(t *testing.T) {
 	if cfg.Settings.SSHBin != "ssh" {
 		t.Errorf("SSHBin default = %q, want %q", cfg.Settings.SSHBin, "ssh")
 	}
-	if cfg.Settings.ControlDir != "/tmp/ssh-tun-tui" {
+	if cfg.Settings.ControlDir != "/tmp/tuinnel" {
 		t.Errorf("ControlDir default = %q", cfg.Settings.ControlDir)
 	}
 	if len(cfg.Tunnels) != 0 {
@@ -394,7 +394,7 @@ func TestSaveConfig(t *testing.T) {
 
 func TestConfigPath(t *testing.T) {
 	home, _ := os.UserHomeDir()
-	want := filepath.Join(home, ".config", "ssh-tun-tui", "config.toml")
+	want := filepath.Join(home, ".config", "tuinnel", "config.toml")
 	if got := DefaultConfigPath(); got != want {
 		t.Errorf("DefaultConfigPath() = %q, want %q", got, want)
 	}
@@ -434,13 +434,13 @@ type Config struct {
 
 func DefaultConfigPath() string {
 	home, _ := os.UserHomeDir()
-	return filepath.Join(home, ".config", "ssh-tun-tui", "config.toml")
+	return filepath.Join(home, ".config", "tuinnel", "config.toml")
 }
 
 func DefaultSettings() Settings {
 	return Settings{
 		SSHBin:     "ssh",
-		ControlDir: "/tmp/ssh-tun-tui",
+		ControlDir: "/tmp/tuinnel",
 	}
 }
 
@@ -550,9 +550,9 @@ func TestBuildCheckArgs(t *testing.T) {
 }
 
 func TestControlSocketPath(t *testing.T) {
-	c := Client{ControlDir: "/tmp/ssh-tun-tui"}
-	if got := c.SocketPath("dev-db"); got != "/tmp/ssh-tun-tui/dev-db" {
-		t.Errorf("SocketPath() = %q, want %q", got, "/tmp/ssh-tun-tui/dev-db")
+	c := Client{ControlDir: "/tmp/tuinnel"}
+	if got := c.SocketPath("dev-db"); got != "/tmp/tuinnel/dev-db" {
+		t.Errorf("SocketPath() = %q, want %q", got, "/tmp/tuinnel/dev-db")
 	}
 }
 ```
@@ -730,7 +730,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/ssh-tun-tui/internal/ssh"
+	"github.com/lululau/tuinnel/internal/ssh"
 )
 
 type RingBuffer struct {
@@ -1069,7 +1069,7 @@ import (
 	"strings"
 
 	tea "charm.land/bubbletea/v2"
-	"github.com/ssh-tun-tui/internal/ui"
+	"github.com/lululau/tuinnel/internal/ui"
 )
 
 type TabID int
@@ -1189,8 +1189,8 @@ import (
 	"charm.land/bubbles/v2/table"
 	"charm.land/lipgloss/v2"
 
-	"github.com/ssh-tun-tui/internal/tunnel"
-	"github.com/ssh-tun-tui/internal/ui"
+	"github.com/lululau/tuinnel/internal/tunnel"
+	"github.com/lululau/tuinnel/internal/ui"
 )
 
 type tunnelListModel struct {
@@ -1328,8 +1328,8 @@ import (
 	"charm.land/bubbles/v2/viewport"
 	"charm.land/lipgloss/v2"
 
-	"github.com/ssh-tun-tui/internal/tunnel"
-	"github.com/ssh-tun-tui/internal/ui"
+	"github.com/lululau/tuinnel/internal/tunnel"
+	"github.com/lululau/tuinnel/internal/ui"
 )
 
 type logModel struct {
@@ -1456,8 +1456,8 @@ import (
 	"charm.land/bubbles/v2/key"
 	"charm.land/bubbles/v2/textinput"
 
-	"github.com/ssh-tun-tui/internal/tunnel"
-	"github.com/ssh-tun-tui/internal/ui"
+	"github.com/lululau/tuinnel/internal/tunnel"
+	"github.com/lululau/tuinnel/internal/ui"
 )
 
 type settingsModel struct {
@@ -1478,7 +1478,7 @@ func newSettingsModel(settings tunnel.Settings) settingsModel {
 	inputs[0].SetValue(settings.SSHBin)
 
 	inputs[1] = textinput.New()
-	inputs[1].Placeholder = "/tmp/ssh-tun-tui"
+	inputs[1].Placeholder = "/tmp/tuinnel"
 	inputs[1].CharLimit = 100
 	inputs[1].SetValue(settings.ControlDir)
 
@@ -1638,8 +1638,8 @@ import (
 	"charm.land/bubbles/v2/key"
 	"charm.land/bubbles/v2/textinput"
 
-	"github.com/ssh-tun-tui/internal/tunnel"
-	"github.com/ssh-tun-tui/internal/ui"
+	"github.com/lululau/tuinnel/internal/tunnel"
+	"github.com/lululau/tuinnel/internal/ui"
 )
 
 type editorMode int
@@ -1888,9 +1888,9 @@ import (
 	tea "charm.land/bubbletea/v2"
 	"charm.land/bubbles/v2/key"
 
-	"github.com/ssh-tun-tui/internal/tunnel"
-	"github.com/ssh-tun-tui/internal/ui"
-	"github.com/ssh-tun-tui/internal/ui/tabs"
+	"github.com/lululau/tuinnel/internal/tunnel"
+	"github.com/lululau/tuinnel/internal/ui"
+	"github.com/lululau/tuinnel/internal/ui/tabs"
 )
 
 type appKeyMap struct {
@@ -2090,7 +2090,7 @@ func (m Model) View() string {
 	}
 
 	return fmt.Sprintf("%s\n%s\n%s\n%s",
-		ui.StyleTitle.Render(" ssh-tun-tui"),
+		ui.StyleTitle.Render(" tuinnel"),
 		m.tabBar.View(),
 		content,
 		statusBar,
@@ -2268,8 +2268,8 @@ import (
 
 	tea "charm.land/bubbletea/v2"
 
-	"github.com/ssh-tun-tui/internal/app"
-	"github.com/ssh-tun-tui/internal/tunnel"
+	"github.com/lululau/tuinnel/internal/app"
+	"github.com/lululau/tuinnel/internal/tunnel"
 )
 
 func main() {
@@ -2311,12 +2311,12 @@ func loadOrCreateConfig(path string) (*tunnel.Config, error) {
 
 **Step 2: Build and verify**
 
-Run: `go build -o ssh-tun-tui .`
+Run: `go build -o tuinnel .`
 Expected: binary created, no errors
 
 **Step 3: Quick smoke test**
 
-Run: `./ssh-tun-tui`
+Run: `./tuinnel`
 Expected: TUI opens with empty tunnel list, Tab bar visible, can navigate tabs with 1-4, q to quit
 
 Press `q` to exit.
@@ -2354,7 +2354,7 @@ Address any type mismatches between bubbletea v2 API and the code. Common fixes:
 
 **Step 4: Final smoke test**
 
-Run: `go build -o ssh-tun-tui . && ./ssh-tun-tui`
+Run: `go build -o tuinnel . && ./tuinnel`
 Verify:
 - Tab bar shows 4 tabs
 - Tab 1 (Tunnels) shows empty table
@@ -2384,11 +2384,11 @@ Create `examples/config.toml`:
 
 ```toml
 # SSH Tunnel TUI Manager Configuration
-# Path: ~/.config/ssh-tun-tui/config.toml
+# Path: ~/.config/tuinnel/config.toml
 
 [settings]
 ssh_bin = "ssh"                        # Path to SSH binary
-control_dir = "/tmp/ssh-tun-tui"       # Control socket directory
+control_dir = "/tmp/tuinnel"       # Control socket directory
 kill_on_exit = false                    # Kill tunnels on exit
 
 # Local port forwarding: local_port:remote_host:remote_port

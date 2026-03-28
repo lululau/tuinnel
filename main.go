@@ -6,8 +6,8 @@ import (
 
 	tea "charm.land/bubbletea/v2"
 
-	"github.com/ssh-tun-tui/internal/app"
-	"github.com/ssh-tun-tui/internal/tunnel"
+	"github.com/lululau/tuinnel/internal/app"
+	"github.com/lululau/tuinnel/internal/tunnel"
 )
 
 func main() {
